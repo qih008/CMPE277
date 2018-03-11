@@ -4,6 +4,7 @@ import org.mariuszgromada.math.mxparser.*;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.support.design.widget.NavigationView;
@@ -34,9 +35,9 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private static final Random rand = new Random();
-    private int numberSucceeded = 0;
-    private int numberSkipped = 0;
-    private int numberAttempt = 1;
+    private int numberSucceeded;
+    private int numberSkipped;
+    private int numberAttempt;
     private int r1 = 0;
     private int r2 = 0;
     private int r3 = 0;
@@ -45,18 +46,24 @@ public class MainActivity extends AppCompatActivity {
 
 
     private DrawerLayout mDrawerLayout;
+    private SharedPreferences mPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         loadActivity(intent);
+
     }
 
     private void loadActivity(Intent intent){
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         numberAttempt = 1;
+        mPrefs = getSharedPreferences("my_prefs", MODE_PRIVATE);
+        numberSucceeded = mPrefs.getInt("numberSucceeded", 0);
+        numberSkipped = mPrefs.getInt("numberSkipped", 0);
+
 
         // init top 4 textviews
         binding.editAttempt.setText(String.valueOf(numberAttempt));
@@ -85,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
         else{
-            Log.wtf("myWTF", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
             int[] numberList = intent.getIntArrayExtra("NumberList");
             r1 = numberList[0];
             r2 = numberList[1];
@@ -240,7 +247,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
                     openDialog(temp);
-                    numberSucceeded += 1;
+                    SharedPreferences.Editor ed = mPrefs.edit();
+                    ed.putInt("numberSucceeded", numberSucceeded + 1);
+                    ed.commit();
                 }
 
         }
@@ -263,7 +272,9 @@ public class MainActivity extends AppCompatActivity {
                         // For example, swap UI fragments here
                         switch (menuItem.getItemId()) {
                             case R.id.nav_show:
-                                numberSkipped += 1;
+                                SharedPreferences.Editor ed = mPrefs.edit();
+                                ed.putInt("numberSkipped", numberSkipped + 1);
+                                ed.commit();
                                 if(result != null)
                                     showmeDialog1(result);
                                 else{
@@ -322,7 +333,9 @@ public class MainActivity extends AppCompatActivity {
                 binding.number4.setEnabled(true);
                 return true;
             case R.id.action_skip:
-                numberSkipped += 1;
+                SharedPreferences.Editor ed = mPrefs.edit();
+                ed.putInt("numberSkipped", numberSkipped + 1);
+                ed.commit();
                 loadActivity(null);
                 return true;
             case android.R.id.home:
@@ -357,18 +370,14 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("someVarA", numberSucceeded);
-        outState.putInt("someVarB", numberSkipped);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        numberSucceeded = savedInstanceState.getInt("someVarA");
-        numberSkipped = savedInstanceState.getInt("someVarB") + 1;
-    }
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        Log.wtf("myWTF", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+//        SharedPreferences.Editor ed = mPrefs.edit();
+//        ed.putInt("numberSucceeded", numberSucceeded);
+//        ed.putInt("numberSkipped", numberSkipped);
+//        ed.commit();
+//    }
 
 }

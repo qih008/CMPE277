@@ -1,6 +1,7 @@
 package com.example.qih008.make24;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +18,8 @@ public class PickerActivity extends AppCompatActivity {
     NumberPicker noPicker3 = null;
     NumberPicker noPicker4 = null;
     Button buttonSelect;
+
+    private SharedPreferences mPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,12 @@ public class PickerActivity extends AppCompatActivity {
         noPicker4.setMinValue(1);
         noPicker4.setWrapSelectorWheel(false);
 
+        mPrefs = getSharedPreferences("my_prefs", MODE_PRIVATE);
+        int numberSkipped = mPrefs.getInt("numberSkipped", 0);
+        SharedPreferences.Editor ed = mPrefs.edit();
+        ed.putInt("numberSkipped", numberSkipped + 1);
+        ed.commit();
+
         buttonSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -56,6 +65,7 @@ public class PickerActivity extends AppCompatActivity {
                 sendNumber(view, numberList);
             }
         });
+
 
     }
 
