@@ -32,19 +32,19 @@ public class PickerActivity extends AppCompatActivity {
         noPicker4 = findViewById(R.id.numberPicker4);
         buttonSelect = findViewById(R.id.buttonSelect);
 
-        noPicker1.setMaxValue(10);
+        noPicker1.setMaxValue(9);
         noPicker1.setMinValue(1);
         noPicker1.setWrapSelectorWheel(false);
 
-        noPicker2.setMaxValue(10);
+        noPicker2.setMaxValue(9);
         noPicker2.setMinValue(1);
         noPicker2.setWrapSelectorWheel(false);
 
-        noPicker3.setMaxValue(10);
+        noPicker3.setMaxValue(9);
         noPicker3.setMinValue(1);
         noPicker3.setWrapSelectorWheel(false);
 
-        noPicker4.setMaxValue(10);
+        noPicker4.setMaxValue(9);
         noPicker4.setMinValue(1);
         noPicker4.setWrapSelectorWheel(false);
 
