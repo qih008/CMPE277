@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/action_delete"
+        android:icon="@mipmap/ic_action_remove"
+        android:title="action_delete"
+        app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/action_skip"
+        android:icon="@mipmap/ic_action_refresh"
+        android:title="action_skip"
+        app:showAsAction="ifRoom"/>
+
+</menu>

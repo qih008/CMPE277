@@ -3,13 +3,24 @@ package com.example.qih008.make24;
 import org.mariuszgromada.math.mxparser.*;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 import android.support.design.widget.Snackbar;
 
@@ -30,40 +41,58 @@ public class MainActivity extends AppCompatActivity {
     private int r2 = 0;
     private int r3 = 0;
     private int r4 = 0;
+    private String result = null;
+
+
+    private DrawerLayout mDrawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        loadActivity();
+        Intent intent = getIntent();
+        loadActivity(intent);
     }
 
-    private void loadActivity(){
+    private void loadActivity(Intent intent){
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         numberAttempt = 1;
-
-        r1 = rand.nextInt(9) + 1;
-        r2 = rand.nextInt(9) + 1;
-        r3 = rand.nextInt(9) + 1;
-        r4 = rand.nextInt(9) + 1;
-
-        // check if this 4 numbers have a solution
-        String result = getSolution(r1,r2,r3,r4);
-        while(result == null){
-            r1 = rand.nextInt(9) + 1;
-            r2 = rand.nextInt(9) + 1;
-            r3 = rand.nextInt(9) + 1;
-            r4 = rand.nextInt(9) + 1;
-            result = getSolution(r1,r2,r3,r4);
-        }
-        Log.wtf("myWTF",result);
 
         // init top 4 textviews
         binding.editAttempt.setText(String.valueOf(numberAttempt));
         binding.editSucceeded.setText(String.valueOf(numberSucceeded));
         binding.editSkipped.setText(String.valueOf(numberSkipped));
         binding.editTime.start();
+
+
+
+        if(intent == null || intent.getIntArrayExtra("NumberList") == null) {
+            r1 = rand.nextInt(9) + 1;
+            r2 = rand.nextInt(9) + 1;
+            r3 = rand.nextInt(9) + 1;
+            r4 = rand.nextInt(9) + 1;
+
+            // check if this 4 numbers have a solution
+            result = getSolution(r1, r2, r3, r4);
+            while (result == null) {
+                r1 = rand.nextInt(9) + 1;
+                r2 = rand.nextInt(9) + 1;
+                r3 = rand.nextInt(9) + 1;
+                r4 = rand.nextInt(9) + 1;
+                result = getSolution(r1, r2, r3, r4);
+            }
+            Log.wtf("myWTF", result);
+
+        }
+        else{
+            Log.wtf("myWTF", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            int[] numberList = intent.getIntArrayExtra("NumberList");
+            r1 = numberList[0];
+            r2 = numberList[1];
+            r3 = numberList[2];
+            r4 = numberList[3];
+        }
+        result = getSolution(r1, r2, r3, r4);
 
         //Log.wtf("myWTF", String.valueOf(r1));
 
@@ -216,6 +245,43 @@ public class MainActivity extends AppCompatActivity {
 
         }
         });
+
+        // Set up navigation drawer and handle click
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        // set item as selected to persist highlight
+                        menuItem.setChecked(true);
+                        // close drawer when item is tapped
+                        mDrawerLayout.closeDrawers();
+
+                        // Add code here to update the UI based on the item selected
+                        // For example, swap UI fragments here
+                        switch (menuItem.getItemId()) {
+                            case R.id.nav_show:
+                                numberSkipped += 1;
+                                if(result != null)
+                                    showmeDialog1(result);
+                                else{
+                                    showmeDialog1("");
+                                }
+                                return true;
+                            case R.id.nav_assign:
+                                callPicker();
+                                return true;
+                        }
+
+                        return true;
+                    }
+                });
+
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
     }
 
     public void openDialog(String s){
@@ -225,11 +291,84 @@ public class MainActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
-                        loadActivity();
+                        loadActivity(null);
                     }
                 });
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_main_actions, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /**
+     * On selecting action bar icons
+     * */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Take appropriate action for each action item click
+        switch (item.getItemId()) {
+            case R.id.action_delete:
+                binding.mainScreen.setText("");
+                binding.number1.setEnabled(true);
+                binding.number2.setEnabled(true);
+                binding.number3.setEnabled(true);
+                binding.number4.setEnabled(true);
+                return true;
+            case R.id.action_skip:
+                numberSkipped += 1;
+                loadActivity(null);
+                return true;
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void showmeDialog1(String s){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        if(s.equals(""))
+            alertDialogBuilder.setMessage("Sorry, there are actually no solutions");
+        else
+            alertDialogBuilder.setMessage("The solution is: " + s + "=24");
+        alertDialogBuilder.setPositiveButton("Next Puzzle",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        loadActivity(null);
+                    }
+                });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+
+    public void callPicker(){
+        Intent intent = new Intent(this, PickerActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("someVarA", numberSucceeded);
+        outState.putInt("someVarB", numberSkipped);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        numberSucceeded = savedInstanceState.getInt("someVarA");
+        numberSkipped = savedInstanceState.getInt("someVarB") + 1;
+    }
+
 }
