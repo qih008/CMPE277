@@ -3,14 +3,17 @@ package com.example.qih008.mortgagecalculator;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -27,6 +30,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        loadActivity();
+    }
+
+    private void loadActivity(){
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         // avoid automatically appear android keyboard when activity start
@@ -39,7 +46,41 @@ public class MainActivity extends AppCompatActivity {
         //NumberTextWatcherForThousand.trimCommaOfString(editText.getText().toString())
 
 
+        // Calculate the mortgage
 
+        binding.buttonCalculate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String s_property_price = NumberTextWatcherForThousand.trimCommaOfString(binding.numberPrice.getText().toString());
+                String s_down_payment = NumberTextWatcherForThousand.trimCommaOfString(binding.numberPayment.getText().toString());
+                String s_apr = binding.numberAPR.getText().toString();
+
+                if(s_property_price.isEmpty() || s_down_payment.isEmpty() || s_apr.isEmpty()){
+                    Snackbar.make(view, "Missing required fields. Please check!", Snackbar.LENGTH_SHORT).show();
+                    binding.numberMonthly.setText("");
+                }
+                else {
+                    Double n_apr = Double.parseDouble(s_apr);
+                    Double n_property_price = Double.parseDouble(s_property_price);
+                    Double n_down_payment = Double.parseDouble(s_down_payment);
+                    String s_year = binding.spinnerTerm.getSelectedItem().toString();
+                    int year = 15;
+                    if(s_year.charAt(0) == '3')                      // check spinner value
+                        year = 30;
+
+                    Double r = n_apr / 12 / 100;                      // monthly percentage rage
+                    Double P = n_property_price - n_down_payment;     // total loan amount
+                    int n = year * 12;                                // total payment month
+                    Double temp = Math.pow(1 + r, n) - 1;             // function: M = P * r(1+r)^n / ((1+r)^n - 1)
+                    Double M = P * r * Math.pow(1 + r, n) / temp;     // monthly payment
+                    int monthly_payment = (int) Math.round(M);       // round up to int
+                    binding.numberMonthly.setText(Integer.toString(monthly_payment));
+                    Log.wtf("myWTF", n_property_price + "  " + n_down_payment + "  " + n_apr + "  " + year);
+                    Log.wtf("myWTF", r + "  " + P + "  " + n + "  " + temp);
+                }
+
+            }
+        });
 
 
         // Set up navigation drawer and handle click
@@ -118,12 +159,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Take appropriate action for each action item click
         switch (item.getItemId()) {
-//            case R.id.action_skip:
-//                SharedPreferences.Editor ed = mPrefs.edit();
-//                ed.putInt("numberSkipped", numberSkipped + 1);
-//                ed.commit();
-//                loadActivity(null);
-//                return true;
+            case R.id.action_new:
+                loadActivity();
+                return true;
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
