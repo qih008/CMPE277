@@ -20,6 +20,11 @@ import android.widget.Spinner;
 
 import com.example.qih008.mortgagecalculator.databinding.ActivityMainBinding;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
@@ -35,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadActivity(){
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
+        mPrefs = getSharedPreferences("my_prefs", MODE_PRIVATE);
 
         // avoid automatically appear android keyboard when activity start
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -75,10 +82,69 @@ public class MainActivity extends AppCompatActivity {
                     Double M = P * r * Math.pow(1 + r, n) / temp;     // monthly payment
                     int monthly_payment = (int) Math.round(M);       // round up to int
                     binding.numberMonthly.setText(Integer.toString(monthly_payment));
-                    Log.wtf("myWTF", n_property_price + "  " + n_down_payment + "  " + n_apr + "  " + year);
-                    Log.wtf("myWTF", r + "  " + P + "  " + n + "  " + temp);
+                    //Log.wtf("myWTF", n_property_price + "  " + n_down_payment + "  " + n_apr + "  " + year);
+                    //Log.wtf("myWTF", r + "  " + P + "  " + n + "  " + temp);
                 }
+            }
+        });
 
+        // handling save mortgage calculation
+        binding.buttonSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String s_property_price = NumberTextWatcherForThousand.trimCommaOfString(binding.numberPrice.getText().toString());
+                String s_down_payment = NumberTextWatcherForThousand.trimCommaOfString(binding.numberPayment.getText().toString());
+                String s_apr = binding.numberAPR.getText().toString();
+                String monthly_payment = binding.numberMonthly.getText().toString();
+                String address = binding.editStreet.getText().toString();
+                String city = binding.editCity.getText().toString();
+                String zipcode = binding.editZipcode.getText().toString();
+
+                // check require field must be fill out
+                if(s_property_price.isEmpty() || s_down_payment.isEmpty() || s_apr.isEmpty() || address.isEmpty()
+                        || city.isEmpty() || zipcode.isEmpty() || monthly_payment.isEmpty()){
+                    Snackbar.make(view, "Missing required fields. Please check!", Snackbar.LENGTH_SHORT).show();
+                }
+                else{
+                    Double loan = Double.parseDouble(s_property_price) - Double.parseDouble(s_down_payment);
+                    String type = binding.spinnerType.getSelectedItem().toString();
+                    String state = binding.spinnerState.getSelectedItem().toString();
+
+                    Set<String> set = new HashSet<>();
+                    set.add(address);
+                    set.add(city);
+                    set.add(state);
+                    set.add(zipcode);
+                    set.add(type);
+                    set.add(loan.toString());
+                    set.add(s_apr);
+                    set.add(monthly_payment);
+
+                    SharedPreferences.Editor ed = mPrefs.edit();
+                    ed.putStringSet(address+zipcode, set);
+                    ed.commit();
+
+                }
+            }
+        });
+
+
+
+        // test for saved data
+        binding.buttonShow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Map<String, ?> values = mPrefs.getAll();
+
+                for (Map.Entry entry  : values.entrySet()) {
+                    String key = (String) entry.getKey();
+                    Log.wtf("myWTF", key);
+                    Set<String> tempset = mPrefs.getStringSet(key, new HashSet<String>());
+                    for(String s : tempset){
+                        Log.wtf("myWTF", s);
+                    }
+                    Log.wtf("myWTF", "            ");
+                }
             }
         });
 

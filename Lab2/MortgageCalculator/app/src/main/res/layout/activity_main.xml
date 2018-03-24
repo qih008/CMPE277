@@ -274,6 +274,15 @@
                     android:layout_marginTop="20dp"
                     android:text="Save" />
 
+                <Button
+                    android:id="@+id/buttonShow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textZipcode"
+                    android:layout_toLeftOf="@+id/buttonSave"
+                    android:layout_marginTop="20dp"
+                    android:text="Show save data" />
+
 
             </RelativeLayout>
 
