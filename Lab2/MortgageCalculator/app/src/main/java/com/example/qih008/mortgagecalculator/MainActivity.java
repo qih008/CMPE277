@@ -1,5 +1,6 @@
 package com.example.qih008.mortgagecalculator;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.support.design.widget.NavigationView;
@@ -164,21 +165,11 @@ public class MainActivity extends AppCompatActivity {
 
                         // Add code here to update the UI based on the item selected
                         // For example, swap UI fragments here
-//                        switch (menuItem.getItemId()) {
-//                            case R.id.nav_show:
-//                                SharedPreferences.Editor ed = mPrefs.edit();
-//                                ed.putInt("numberSkipped", numberSkipped + 1);
-//                                ed.commit();
-//                                if(result != null)
-//                                    showmeDialog1(result);
-//                                else{
-//                                    showmeDialog1("");
-//                                }
-//                                return true;
-//                            case R.id.nav_assign:
-//                                callPicker();
-//                                return true;
-//                        }
+                        switch (menuItem.getItemId()) {
+                            case R.id.nav_map:
+                                callMap();
+                                return true;
+                        }
 
                         return true;
                     }
@@ -234,5 +225,10 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void callMap(){
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
     }
 }
