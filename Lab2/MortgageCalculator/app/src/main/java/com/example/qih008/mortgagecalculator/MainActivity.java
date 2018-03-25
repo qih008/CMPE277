@@ -111,18 +111,21 @@ public class MainActivity extends AppCompatActivity {
                     String type = binding.spinnerType.getSelectedItem().toString();
                     String state = binding.spinnerState.getSelectedItem().toString();
 
-                    Set<String> set = new HashSet<>();
-                    set.add(address);
-                    set.add(city);
-                    set.add(state);
-                    set.add(zipcode);
-                    set.add(type);
-                    set.add(loan.toString());
-                    set.add(s_apr);
-                    set.add(monthly_payment);
+                    String data = address + ":" + city + ":" + state + ":" + zipcode + ":" + type + ":" + loan.toString() + ":" + s_apr + ":" + monthly_payment;
+
+//                    Set<String> set = new HashSet<>();
+//                    set.add(address);
+//                    set.add(city);
+//                    set.add(state);
+//                    set.add(zipcode);
+//                    set.add(type);
+//                    set.add(loan.toString());
+//                    set.add(s_apr);
+//                    set.add(monthly_payment);
 
                     SharedPreferences.Editor ed = mPrefs.edit();
-                    ed.putStringSet(address+zipcode, set);
+//                    ed.putStringSet(address+zipcode, set);
+                    ed.putString(address+zipcode, data);
                     ed.commit();
 
                 }
@@ -136,15 +139,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Map<String, ?> values = mPrefs.getAll();
-
-                for (Map.Entry entry  : values.entrySet()) {
-                    String key = (String) entry.getKey();
-                    Log.wtf("myWTF", key);
-                    Set<String> tempset = mPrefs.getStringSet(key, new HashSet<String>());
-                    for(String s : tempset){
-                        Log.wtf("myWTF", s);
+                if(values.size() != 0) {
+                    for (Map.Entry entry : values.entrySet()) {
+                        String key = (String) entry.getKey();
+                        Log.wtf("myWTF", key);
+                        String tempStr = mPrefs.getString(key,"");
+                        //String tempStr = (String) entry.getValue();
+                        String[] tempAry = tempStr.split(":");
+                        for (String s : tempAry) {
+                            Log.wtf("myWTF", s);
+                        }
+                        Log.wtf("myWTF", "            ");
                     }
-                    Log.wtf("myWTF", "            ");
                 }
             }
         });
