@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
 
                     SharedPreferences.Editor ed = mPrefs.edit();
 //                    ed.putStringSet(address+zipcode, set);
-                    ed.putString(address+zipcode, data);
+                    ed.putString(address+" "+zipcode, data);
                     ed.commit();
 
                 }
