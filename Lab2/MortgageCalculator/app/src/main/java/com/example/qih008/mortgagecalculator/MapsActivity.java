@@ -6,12 +6,15 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
@@ -47,21 +50,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
-//        ****************** new ******************
-
         Map<String, ?> values = mPrefs.getAll();
-        for (Map.Entry entry : values.entrySet()) {
-            String key = (String) entry.getKey();
-            LatLng home = getLocationFromAddress(this, key);
-            mMap.addMarker(new MarkerOptions().position(home).title("Marker in Home"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(home));
+        if (mMap != null){
+            for (Map.Entry entry : values.entrySet()) {
+                String key = (String) entry.getKey();
+                String tempStr = mPrefs.getString(key,"");
+                String[] tempAry = tempStr.split(":");
+                String snippet = "Type: " + tempAry[4] + "\n" + "Street Address:" + tempAry[0] + "\n" + "City: "
+                        + tempAry[1] + "\n" + "Loan amount: " + tempAry[5] + "\n" + "APR: " + tempAry[6] + "\n" +
+                        "Monthly payment: " + tempAry[7];
+                LatLng home = getLocationFromAddress(this, key);
+                mMap.addMarker(new MarkerOptions().position(home).title(key).snippet(snippet));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(home));
+                mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+                    @Override
+                    public View getInfoWindow(Marker marker) {
+                        return null;
+                    }
+
+                    @Override
+                    public View getInfoContents(Marker marker) {
+                        View info = getLayoutInflater().inflate(R.layout.info_window, null);
+                        TextView t1 = info.findViewById(R.id.title);
+                        TextView t2 = info.findViewById(R.id.detail);
+                        t1.setText(marker.getTitle());
+                        t2.setText((marker.getSnippet()));
+                        return info;
+                    }
+                });
+            }
+
         }
+
+
     }
 
 
