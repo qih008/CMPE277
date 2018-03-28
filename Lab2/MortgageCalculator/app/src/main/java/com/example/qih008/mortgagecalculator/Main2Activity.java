@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class MainActivity extends AppCompatActivity {
+public class Main2Activity extends AppCompatActivity {
 
     public ActivityMainBinding binding;
 
@@ -53,7 +53,15 @@ public class MainActivity extends AppCompatActivity {
         binding.numberPayment.addTextChangedListener(new NumberTextWatcherForThousand(binding.numberPayment));
         // To get the input as plain Double Text
         //NumberTextWatcherForThousand.trimCommaOfString(editText.getText().toString())
-
+        binding.numberAPR.setText(getIntent().getExtras().getString("Apr"));
+        binding.numberPrice.setText(getIntent().getExtras().getString("PropertyPrice"));
+        binding.numberPayment.setText(getIntent().getExtras().getString("DownPayment"));
+        binding.numberMonthly.setText(getIntent().getExtras().getString("MonthlyPayment"));
+        binding.editStreet.setText(getIntent().getExtras().getString("Address"));
+        binding.editCity.setText(getIntent().getExtras().getString("City"));
+        binding.editZipcode.setText(getIntent().getExtras().getString("Zip"));
+        //        binding.spinnerState.setText(getIntent().getExtras().getString("State"));
+        //        binding.spinnerType.setText(getIntent().getExtras().getString("Type"));
 
         // Calculate the mortgage
 
@@ -112,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                     String type = binding.spinnerType.getSelectedItem().toString();
                     String state = binding.spinnerState.getSelectedItem().toString();
 
-                    String data = address + ":" + city + ":" + state + ":" + zipcode + ":" + type + ":" + loan.toString() + ":" + s_apr + ":" + monthly_payment + ":" + s_property_price + ":" + s_down_payment;
+                    String data = address + ":" + city + ":" + state + ":" + zipcode + ":" + type + ":" + loan.toString() + ":" + s_apr + ":" + monthly_payment + ":" + s_property_price + ":" + s_down_payment + ":";
 
 //                    Set<String> set = new HashSet<>();
 //                    set.add(address);
