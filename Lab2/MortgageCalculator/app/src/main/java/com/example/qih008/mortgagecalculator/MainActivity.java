@@ -48,12 +48,12 @@ public class MainActivity extends AppCompatActivity {
         // avoid automatically appear android keyboard when activity start
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
+
         // auto edit input amount format
         binding.numberPrice.addTextChangedListener(new NumberTextWatcherForThousand(binding.numberPrice));
         binding.numberPayment.addTextChangedListener(new NumberTextWatcherForThousand(binding.numberPayment));
         // To get the input as plain Double Text
         //NumberTextWatcherForThousand.trimCommaOfString(editText.getText().toString())
-
 
         // Calculate the mortgage
 
