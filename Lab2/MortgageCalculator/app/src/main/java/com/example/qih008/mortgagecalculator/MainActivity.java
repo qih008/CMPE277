@@ -37,10 +37,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loadActivity();
+        Intent intent = getIntent();
+        loadActivity(intent);
     }
 
-    private void loadActivity(){
+    private void loadActivity(Intent intent){
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         mPrefs = getSharedPreferences("my_prefs", MODE_PRIVATE);
@@ -54,6 +55,17 @@ public class MainActivity extends AppCompatActivity {
         binding.numberPayment.addTextChangedListener(new NumberTextWatcherForThousand(binding.numberPayment));
         // To get the input as plain Double Text
         //NumberTextWatcherForThousand.trimCommaOfString(editText.getText().toString())
+
+
+        if(intent != null && intent.getExtras() != null) {
+            binding.numberAPR.setText(intent.getExtras().getString("Apr"));
+            binding.numberPrice.setText(intent.getExtras().getString("PropertyPrice"));
+            binding.numberPayment.setText(intent.getExtras().getString("DownPayment"));
+            binding.numberMonthly.setText(intent.getExtras().getString("MonthlyPayment"));
+            binding.editStreet.setText(intent.getExtras().getString("Address"));
+            binding.editCity.setText(intent.getExtras().getString("City"));
+            binding.editZipcode.setText(intent.getExtras().getString("Zip"));
+        }
 
         // Calculate the mortgage
 
@@ -224,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
         // Take appropriate action for each action item click
         switch (item.getItemId()) {
             case R.id.action_new:
-                loadActivity();
+                loadActivity(null);
                 return true;
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);

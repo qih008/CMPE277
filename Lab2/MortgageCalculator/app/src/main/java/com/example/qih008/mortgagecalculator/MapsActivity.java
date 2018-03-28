@@ -143,7 +143,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         dialog.dismiss();
-                                        Intent intent = new Intent(MapsActivity.this, Main2Activity.class);
+                                        Intent intent = new Intent(MapsActivity.this, MainActivity.class);
 //                                        Bundle b = new Bundle();
 //                                        b.putString("PropertyPrice",tempAry[8]);
 //                                        b.putString("Apr",tempAry[6]);
