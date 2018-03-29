@@ -1,8 +1,12 @@
 package com.example.qih008.mortgagecalculator;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -20,9 +24,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.example.qih008.mortgagecalculator.databinding.ActivityMainBinding;
+import com.google.android.gms.maps.model.LatLng;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,12 +40,14 @@ public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
     private SharedPreferences mPrefs;
+    private Context context;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
+        context = this;
         loadActivity(intent);
     }
 
@@ -45,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         mPrefs = getSharedPreferences("my_prefs", MODE_PRIVATE);
+
 
         // avoid automatically appear android keyboard when activity start
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -102,6 +113,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
+
+
         // handling save mortgage calculation
         binding.buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,16 +128,25 @@ public class MainActivity extends AppCompatActivity {
                 String address = binding.editStreet.getText().toString();
                 String city = binding.editCity.getText().toString();
                 String zipcode = binding.editZipcode.getText().toString();
+                String state = binding.spinnerState.getSelectedItem().toString();
+
+
+                // test invalid address
+                List<Address> tempAddress = getAddressList(context, address+", "+city+", "+state+", "+zipcode);
+                //Log.wtf("myWTF", zipcode.length()+" ");
 
                 // check require field must be fill out
                 if(s_property_price.isEmpty() || s_down_payment.isEmpty() || s_apr.isEmpty() || address.isEmpty()
                         || city.isEmpty() || zipcode.isEmpty() || monthly_payment.isEmpty()){
                     Snackbar.make(view, "Missing required fields. Please check!", Snackbar.LENGTH_SHORT).show();
                 }
+                else if(tempAddress == null || tempAddress.size() == 0 || zipcode.length() != 5){
+                    Snackbar.make(view, "Invalid address. Please check!", Snackbar.LENGTH_SHORT).show();
+                }
                 else{
                     Double loan = Double.parseDouble(s_property_price) - Double.parseDouble(s_down_payment);
                     String type = binding.spinnerType.getSelectedItem().toString();
-                    String state = binding.spinnerState.getSelectedItem().toString();
+                    //String state = binding.spinnerState.getSelectedItem().toString();
 
                     String data = address + ":" + city + ":" + state + ":" + zipcode + ":" + type + ":" + loan.toString() + ":" + s_apr + ":" + monthly_payment + ":" + s_property_price + ":" + s_down_payment;
 
@@ -140,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
 //                    ed.putStringSet(address+zipcode, set);
                     ed.putString(address+" "+zipcode, data);
                     ed.commit();
+                    Snackbar.make(view, "Suceess save mortgage data", Snackbar.LENGTH_SHORT).show();
 
                 }
             }
@@ -249,5 +274,28 @@ public class MainActivity extends AppCompatActivity {
     public void callMap(){
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
+    }
+
+
+    public List<Address> getAddressList(Context context, String address){
+        Geocoder coder = new Geocoder(context, Locale.US);
+        List<Address> tempAddress = null;
+        try {
+            // May throw an IOException
+            tempAddress = coder.getFromLocationName(address, 5);
+
+            if(coder.isPresent())
+                Log.wtf("myWTF", "true");
+
+            if (tempAddress == null || tempAddress.size() == 0) {
+                Log.wtf("myWTF", "address is invalid: " + address);
+            }
+            else
+                Log.wtf("myWTF", "address is: valid: " + address );
+        } catch (IOException ex) {
+            String errorMessage = "Service not available";
+            Log.wtf("myWTF", errorMessage, ex);
+        }
+        return tempAddress;
     }
 }
