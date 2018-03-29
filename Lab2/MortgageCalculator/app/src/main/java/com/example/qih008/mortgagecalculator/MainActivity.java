@@ -54,6 +54,25 @@ public class MainActivity extends AppCompatActivity {
     private void loadActivity(Intent intent){
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
+        // Set up spinner
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.types_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        binding.spinnerType.setAdapter(adapter);
+
+        adapter = ArrayAdapter.createFromResource(this, R.array.years_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.spinnerTerm.setAdapter(adapter);
+
+        adapter = ArrayAdapter.createFromResource(this, R.array.states_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.spinnerState.setAdapter(adapter);
+
+
         mPrefs = getSharedPreferences("my_prefs", MODE_PRIVATE);
 
 
@@ -76,6 +95,8 @@ public class MainActivity extends AppCompatActivity {
             binding.editStreet.setText(intent.getExtras().getString("Address"));
             binding.editCity.setText(intent.getExtras().getString("City"));
             binding.editZipcode.setText(intent.getExtras().getString("Zip"));
+            binding.spinnerState.setSelection(getIndex(binding.spinnerState, intent.getExtras().getString("State")));
+            binding.spinnerType.setSelection(getIndex(binding.spinnerType, intent.getExtras().getString("Type")));
         }
 
         // Calculate the mortgage
@@ -224,23 +245,6 @@ public class MainActivity extends AppCompatActivity {
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
 
-        // Set up spinner
-
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.types_array, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
-        binding.spinnerType.setAdapter(adapter);
-
-        adapter = ArrayAdapter.createFromResource(this, R.array.years_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        binding.spinnerTerm.setAdapter(adapter);
-
-        adapter = ArrayAdapter.createFromResource(this, R.array.states_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        binding.spinnerState.setAdapter(adapter);
     }
 
 
@@ -297,5 +301,20 @@ public class MainActivity extends AppCompatActivity {
             Log.wtf("myWTF", errorMessage, ex);
         }
         return tempAddress;
+    }
+
+    // get spanner value index
+    private int getIndex(Spinner spinner, String myString)
+    {
+        int index = 0;
+
+        for (int i=0;i<spinner.getCount();i++){
+            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(myString)){
+                index = i;
+                break;
+            }
+        }
+        //Log.wtf("myWTF", "index is: " +  index + "  String is: "+ myString);
+        return index;
     }
 }
